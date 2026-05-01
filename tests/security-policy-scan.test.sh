@@ -31,7 +31,7 @@ run_scan() {
   local target="$1"
   shift
 
-  "$SCANNER" --root "$target" "$@" 2>&1
+  bash "$SCANNER" --root "$target" "$@" 2>&1
 }
 
 tmpdir="$(mktemp -d)"
