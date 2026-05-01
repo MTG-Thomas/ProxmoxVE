@@ -56,7 +56,7 @@ function cleanup() {
   [ -d "${CTID_FROM_PATH:-}" ] && pct unmount "$CTID_FROM"
   [ -d "${CTID_TO_PATH:-}" ] && pct unmount "$CTID_TO"
   popd >/dev/null
-  rm -rf "$TEMP_DIR"
+  rm -rf -- "${TEMP_DIR:?}"
 }
 TEMP_DIR=$(mktemp -d)
 pushd "$TEMP_DIR" >/dev/null
@@ -123,7 +123,7 @@ RSYNC_OPTIONS=(
   --info=progress2
 )
 msg "<======== Zwavejs Data ========>"
-rsync "${RSYNC_OPTIONS[*]}" "${CTID_FROM_PATH}"${DATA_PATH} "${CTID_TO_PATH}"${DATA_PATH_NEW}
+rsync "${RSYNC_OPTIONS[@]}" "${CTID_FROM_PATH}${DATA_PATH}" "${CTID_TO_PATH}${DATA_PATH_NEW}"
 echo -en "\e[1A\e[0K\e[1A\e[0K"
 
 info "Successfully Transferred Data."

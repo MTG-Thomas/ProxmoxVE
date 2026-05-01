@@ -50,13 +50,13 @@ function msg() {
   echo -e "$TEXT"
 }
 function cleanup() {
-  [ -d "${CTID_FROM_PATH:-}" ] && pct unmount $CTID_FROM
-  [ -d "${CTID_TO_PATH:-}" ] && pct unmount $CTID_TO
+  [ -d "${CTID_FROM_PATH:-}" ] && pct unmount "$CTID_FROM"
+  [ -d "${CTID_TO_PATH:-}" ] && pct unmount "$CTID_TO"
   popd >/dev/null
-  rm -rf $TEMP_DIR
+  rm -rf -- "${TEMP_DIR:?}"
 }
 TEMP_DIR=$(mktemp -d)
-pushd $TEMP_DIR >/dev/null
+pushd "$TEMP_DIR" >/dev/null
 
 TITLE="Home Assistant LXC Data Copy"
 while read -r line; do
@@ -91,18 +91,18 @@ whiptail --backtitle "Proxmox VE Helper Scripts" --defaultno --title "$TITLE" --
 $CTID_FROM (${CTID_FROM_HOSTNAME}) -> $CTID_TO (${CTID_TO_HOSTNAME})
 Version: 2022.10.02" 13 50
 info "Home Assistant Data from '$CTID_FROM' to '$CTID_TO'"
-if [ $(pct status $CTID_TO | sed 's/.* //') == 'running' ]; then
+if [ "$(pct status "$CTID_TO" | sed 's/.* //')" == 'running' ]; then
   msg "Stopping '$CTID_TO'..."
-  pct stop $CTID_TO
+  pct stop "$CTID_TO"
 fi
 msg "Mounting Container Disks..."
 DOCKER_PATH=/var/lib/docker/volumes/hass_config/_data
 CORE_PATH=/root/.homeassistant
-CTID_FROM_PATH=$(pct mount $CTID_FROM | sed -n "s/.*'\(.*\)'/\1/p") ||
+CTID_FROM_PATH=$(pct mount "$CTID_FROM" | sed -n "s/.*'\(.*\)'/\1/p") ||
   die "There was a problem mounting the root disk of LXC '${CTID_FROM}'."
 [ -d "${CTID_FROM_PATH}${CORE_PATH}" ] ||
   die "Home Assistant directories in '$CTID_FROM' not found."
-CTID_TO_PATH=$(pct mount $CTID_TO | sed -n "s/.*'\(.*\)'/\1/p") ||
+CTID_TO_PATH=$(pct mount "$CTID_TO" | sed -n "s/.*'\(.*\)'/\1/p") ||
   die "There was a problem mounting the root disk of LXC '${CTID_TO}'."
 [ -d "${CTID_TO_PATH}${DOCKER_PATH}" ] ||
   die "Home Assistant directories in '$CTID_TO' not found."
@@ -117,7 +117,7 @@ RSYNC_OPTIONS=(
   --info=progress2
 )
 msg "<======== Docker Data ========>"
-rsync ${RSYNC_OPTIONS[*]} ${CTID_FROM_PATH}${CORE_PATH} ${CTID_TO_PATH}${DOCKER_PATH}
+rsync "${RSYNC_OPTIONS[@]}" "${CTID_FROM_PATH}${CORE_PATH}" "${CTID_TO_PATH}${DOCKER_PATH}"
 echo -en "\e[1A\e[0K\e[1A\e[0K"
 
 info "Successfully Transferred Data."
