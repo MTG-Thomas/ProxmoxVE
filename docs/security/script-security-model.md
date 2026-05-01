@@ -2,6 +2,8 @@
 
 This repository publishes shell scripts that users run as root on Proxmox hosts and inside newly created containers. Treat every script change as privileged automation, not as a normal application patch.
 
+This model is fork-local policy for `MTG-Thomas/ProxmoxVE`. The upstream community project remains the source of the broader script catalog; this fork is where we make those scripts more conservative, explicit, and reviewable for sysadmin use.
+
 ## Trust Boundaries
 
 - Host-side scripts can change Proxmox host storage, networking, VM/container configuration, and LXC device access.
