@@ -46,6 +46,7 @@ DOC
 cat >"$tmpdir/repo/ct/example.sh" <<'SCRIPT'
 #!/usr/bin/env bash
 source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
+source <(curl -fsSL https://raw.githubusercontent.com/MTG-Thomas/ProxmoxVE/main/misc/build.func)
 var_unprivileged="${var_unprivileged:-0}"
 SCRIPT
 
@@ -68,11 +69,12 @@ set -e
 
 [[ "$status" -eq 1 ]] || fail "scanner should exit 1 when findings exist, got $status"
 assert_contains "remote-code-execution" "$output"
+assert_contains "untrusted-upstream-bootstrap" "$output"
 assert_contains "pinned-version-required" "$output"
 assert_contains "privileged-container-default" "$output"
 assert_contains "docker-insecure-tcp" "$output"
 assert_contains "container-privileged-run" "$output"
-assert_contains "5 finding(s)" "$output"
+assert_contains "6 finding(s)" "$output"
 
 set +e
 advisory_output="$(run_scan "$tmpdir/repo" --advisory)"
@@ -81,7 +83,7 @@ set -e
 
 [[ "$advisory_status" -eq 0 ]] || fail "advisory mode should exit 0, got $advisory_status"
 assert_contains "advisory mode" "$advisory_output"
-assert_contains "5 finding(s)" "$advisory_output"
+assert_contains "6 finding(s)" "$advisory_output"
 
 mkdir -p "$tmpdir/clean/ct" "$tmpdir/clean/docs/security"
 cat >"$tmpdir/clean/ct/example.sh" <<'SCRIPT'
@@ -96,6 +98,7 @@ DOC
 clean_output="$(run_scan "$tmpdir/clean")"
 assert_contains "0 finding(s)" "$clean_output"
 assert_not_contains "remote-code-execution" "$clean_output"
+assert_not_contains "untrusted-upstream-bootstrap" "$clean_output"
 
 mkdir -p "$tmpdir/git-repo/ct" "$tmpdir/git-repo/docs/security"
 (
