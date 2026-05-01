@@ -55,7 +55,7 @@ function cleanup() {
   [ -d "${CTID_FROM_PATH:-}" ] && pct unmount "$CTID_FROM"
   [ -d "${CTID_TO_PATH:-}" ] && pct unmount "$CTID_TO"
   popd >/dev/null
-  rm -rf "$TEMP_DIR"
+  rm -rf -- "${TEMP_DIR:?}"
 }
 TEMP_DIR=$(mktemp -d)
 pushd "$TEMP_DIR" >/dev/null
@@ -108,8 +108,11 @@ CTID_TO_PATH=$(pct mount "$CTID_TO" | sed -n "s/.*'\(.*\)'/\1/p") ||
 [ -d "${CTID_TO_PATH}${DOCKER_PATH}" ] ||
   die "Home Assistant directories in '$CTID_TO' not found."
 
-rm -rf "${CTID_TO_PATH}"${DOCKER_PATH}
-mkdir "${CTID_TO_PATH}"${DOCKER_PATH}
+TARGET_PATH="${CTID_TO_PATH}${DOCKER_PATH}"
+SOURCE_PATH="${CTID_FROM_PATH}${DOCKER_PATH}"
+[[ -n "$TARGET_PATH" && -d "$TARGET_PATH" ]] || die "Refusing to remove invalid target path."
+rm -rf -- "$TARGET_PATH"
+mkdir -p -- "$TARGET_PATH"
 
 msg "Copying Data Between Containers..."
 RSYNC_OPTIONS=(
@@ -121,7 +124,7 @@ RSYNC_OPTIONS=(
   --info=progress2
 )
 msg "<======== Docker Data ========>"
-rsync "${RSYNC_OPTIONS[*]}" "${CTID_FROM_PATH}"${DOCKER_PATH} "${CTID_TO_PATH}"${DOCKER_PATH}
+rsync "${RSYNC_OPTIONS[@]}" "$SOURCE_PATH" "$TARGET_PATH"
 echo -en "\e[1A\e[0K\e[1A\e[0K"
 
 info "Successfully Transferred Data."
