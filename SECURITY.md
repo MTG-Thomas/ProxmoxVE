@@ -1,8 +1,15 @@
 # Security Policy
 
+This fork treats helper scripts as privileged infrastructure automation. Many
+entry points are intended to run as root on a Proxmox host or inside a newly
+created container, so security reports should be handled with the same care as
+reports for deployment tooling.
+
 ## Supported Versions
 
-This project currently supports the following versions of Proxmox VE (PVE):
+This fork tracks the current Proxmox VE support window used by the upstream
+project, with fork support focused on hardening, review, and validation of this
+repository's script behavior:
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -15,53 +22,59 @@ This project currently supports the following versions of Proxmox VE (PVE):
 | 8.0.x   | Limited support* ❕ |
 | < 8.0   | :x:                |
 
-*Version 8.0.x  - 8.3.x has limited support. Security updates may not be provided for all issues affecting this version. 
+*Version 8.0.x - 8.3.x has limited support. Security updates may not be provided for all issues affecting this version.
 
-*Debian 13 Containers may fail to install. You can write var_version=12 before the bash call. 
+*Debian 13 containers may fail to install. You can write `var_version=12` before the bash call.
 
 ---
 
 ## Reporting a Vulnerability
 
-Security vulnerabilities must not be reported publicly to avoid potential exploitation.  
-Instead, please report them privately via one of the following channels:
+Do not publish exploit details in a public issue, pull request, Discord thread,
+or discussion. Prefer GitHub private vulnerability reporting for
+`MTG-Thomas/ProxmoxVE` when it is available. If private reporting is not
+available, open a minimal public issue that asks for a private contact path and
+does not include reproduction details.
 
-- **Discord**: Join our [Discord server](https://discord.gg/jsYVk5JBxq) and send a direct message to a maintainer.  
-- **Email**: Write to us at **contact@community-scripts.org** with the subject line:  
-  `Vulnerability Report - <Project/Script Name>`.
+Report fork-specific issues to this fork. Do not use the upstream
+community-scripts Discord or contact address for vulnerabilities introduced by
+this fork.
+
+If the same vulnerability affects
+[`community-scripts/ProxmoxVE`](https://github.com/community-scripts/ProxmoxVE),
+also report it through the upstream project's preferred private channel.
 
 When reporting a vulnerability, please provide:
 
-- A clear description of the issue  
-- Steps to reproduce the vulnerability  
-- Affected versions or environments  
-- (Optional) Suggested fixes or workarounds  
+- A clear description of the issue.
+- The affected script, helper, workflow, or generated artifact.
+- The affected Proxmox VE, Debian, or container versions.
+- Safe reproduction steps, if they can be shared privately.
+- Any suggested fix, mitigation, or upstream reference.
+
+The repository's script-specific security expectations are documented in
+[`docs/security/script-security-model.md`](docs/security/script-security-model.md).
 
 ---
 
 ## Response Process
 
 1. **Acknowledgment**  
-   - We will review and acknowledge your report within **7 business days**.
+   - We will review and acknowledge private reports within **7 business days**.
 
 2. **Assessment**  
-   - The maintainers will verify the issue and classify its severity.  
-   - Depending on impact, a patch may be released immediately or scheduled for the next update.
+   - Maintainers will verify whether the issue affects this fork, upstream, or both.
+   - Depending on impact, a patch may be released immediately or scheduled for the next hardening pass.
 
 3. **Resolution**  
-   - Critical security fixes will be prioritized.  
-   - Non-critical issues may be deferred or declined with an explanation.
+   - Critical security fixes are prioritized over routine script refactors.
+   - Non-critical issues may be documented, deferred, or declined with an explanation.
 
 ---
 
 ## Disclaimer
 
-Not all reported issues will be treated as vulnerabilities.  
-Reports may be declined if they are deemed:  
-- Low-risk  
-- Out of project scope  
-- Conflicting with intended design or architecture  
-
----
-
-If you have any questions or concerns about this security policy, please reach out to the maintainers through the contact options above.
+Not every risky script pattern is automatically a vulnerability. Reports may be
+declined or reclassified if they are low-risk, out of scope for this fork, or a
+documented operational exception. Public hardening ideas are still welcome as
+normal issues or pull requests when they do not expose an active exploit path.

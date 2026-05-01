@@ -1,5 +1,8 @@
-<!--🛑 New scripts must be submitted to [ProxmoxVED](https://github.com/community-scripts/ProxmoxVED) for testing.
-PRs without prior testing will be closed. -->
+<!--
+This fork is focused on sysadmin-oriented hardening of Proxmox VE helper scripts.
+New app coverage should usually start upstream unless it has a fork-specific
+operational purpose. Document risky exceptions clearly.
+-->
 
 ## ✍️ Description
 
@@ -13,6 +16,7 @@ Fixes #
 - [ ] **Self-review completed** – Code follows project standards.
 - [ ] **Tested thoroughly** – Changes work as expected.
 - [ ] **Security policy checked** – No new hardcoded secrets, live remote-code execution, unnecessary privilege escalation, unauthenticated Docker socket exposure, or unpinned high-risk downloads.
+- [ ] **Fork posture preserved** – Conservative defaults, explicit exceptions, and upstream attribution remain clear.
 
 ---
 
@@ -21,7 +25,7 @@ Fixes #
 - [ ] 🐞 **Bug fix** – Resolves an issue without breaking functionality.
 - [ ] ✨ **New feature** – Adds new, non-breaking functionality.
 - [ ] 💥 **Breaking change** – Alters existing functionality in a way that may require updates.
-- [ ] 🆕 **New script** – A fully functional and tested script or script set.
-- [ ] 🌍 **Website update** – Changes to script metadata (PocketBase/website data).
+- [ ] 🆕 **New script** – A tested fork-specific script or script set with clear operational purpose.
+- [ ] 🌍 **Website update** – Changes to generated GitHub Pages or fork documentation.
 - [ ] 🔧 **Refactoring / Code Cleanup** – Improves readability or maintainability without changing functionality.
 - [ ] 📝 **Documentation update** – Changes to `README`, `AppName.md`, `CONTRIBUTING.md`, or other docs.

@@ -1,38 +1,40 @@
-# Contributing to Proxmox VE Helper-Scripts
+# Contributing to the MTG Proxmox VE Helper-Scripts Fork
 
-Welcome! We're glad you want to contribute. This guide covers everything you need to add new scripts, improve existing ones, or help in other ways.
+Welcome. This fork is maintained with a more conservative, sysadmin-oriented posture than the broad upstream catalog. Contributions should make the scripts easier to audit, safer to run as privileged automation, and more predictable on real Proxmox hosts.
 
-For detailed coding standards and full documentation, visit **[community-scripts.org/docs](https://community-scripts.org/docs)**.
+The upstream documentation at **[community-scripts.org/docs](https://community-scripts.org/docs)** remains useful background. This fork adds local standards for security review, fork-owned helper loading, release pinning, and operational defaults.
 
 ---
 
-## How Can I Help?
+## What This Fork Wants
 
-> [!IMPORTANT]
-> **New scripts** must always be submitted to [ProxmoxVED](https://github.com/community-scripts/ProxmoxVED) first — not to this repository.
-> PRs with new scripts opened directly against ProxmoxVE **will be closed without review**.
-> **Bug fixes, improvements, and features for existing scripts** go here (ProxmoxVE).
+Good contributions usually fall into one of these buckets:
 
-| I want to…                                  | Where to go                                                                                  |
-| :------------------------------------------ | :------------------------------------------------------------------------------------------- |
-| **Add a brand-new script**                  | [ProxmoxVED](https://github.com/community-scripts/ProxmoxVED) — testing repo for new scripts |
-| **Fix a bug or improve an existing script** | This repo (ProxmoxVE) — open a PR here                                                       |
-| **Add a feature to an existing script**     | This repo (ProxmoxVE) — open a PR here                                                       |
-| Report a bug or broken script               | [Open an Issue](https://github.com/community-scripts/ProxmoxVE/issues)                       |
-| Request a new script or feature             | [Start a Discussion](https://github.com/community-scripts/ProxmoxVE/discussions)             |
-| Report a security vulnerability             | [Security Policy](SECURITY.md)                                                               |
-| Chat with contributors                      | [Discord](https://discord.gg/3AnUqsXnmK)                                                     |
+- hardening existing scripts without changing their user-facing purpose
+- replacing risky shell patterns with auditable helpers or narrower commands
+- pinning high-risk downloads and documenting exceptions
+- reducing privileged-container defaults where the app does not need them
+- improving update/backup/restore safety
+- improving local tests, advisory scanning, and documentation
+
+This fork is not trying to be the fastest place to add new scripts. New application coverage should generally start upstream. Fork-local additions need a clear operational reason and a clear maintenance owner.
 
 ---
 
 ## Prerequisites
 
-Before writing scripts, we recommend setting up:
+Before changing scripts, set up:
 
 - **Visual Studio Code** with these extensions:
   - [Shell Syntax](https://marketplace.visualstudio.com/items?itemName=bmalehorn.shell-syntax)
   - [ShellCheck](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
   - [Shell Format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)
+- **ShellCheck** and **actionlint** locally. On Windows, both have native builds and can be installed with:
+
+  ```powershell
+  winget install --id koalaman.shellcheck
+  winget install --id rhysd.actionlint
+  ```
 
 ---
 
@@ -45,7 +47,7 @@ Every script consists of two files:
 | `ct/AppName.sh`              | Container creation, variable setup, and update handling |
 | `install/AppName-install.sh` | Application installation logic                          |
 
-Use existing scripts in [`ct/`](ct/) and [`install/`](install/) as reference. Full coding standards and annotated templates are at **[community-scripts.org/docs/contribution](https://community-scripts.org/docs/contribution)**.
+Use existing scripts in [`ct/`](ct/) and [`install/`](install/) as reference, but do not copy legacy risk patterns just because they already exist. Full upstream coding standards and annotated templates are at **[community-scripts.org/docs/contribution](https://community-scripts.org/docs/contribution)**.
 
 ---
 
@@ -53,7 +55,7 @@ Use existing scripts in [`ct/`](ct/) and [`install/`](install/) as reference. Fu
 
 ### Adding a new script
 
-New scripts are **not accepted directly in this repository**. The workflow is:
+This fork is intentionally cautious about new scripts. Prefer the upstream workflow unless the new script has a fork-specific operational purpose:
 
 1. Fork [ProxmoxVED](https://github.com/community-scripts/ProxmoxVED) and clone it
 2. Create a branch: `git switch -c feat/myapp`
@@ -62,7 +64,7 @@ New scripts are **not accepted directly in this repository**. The workflow is:
    - `install/myapp-install.sh`
 4. Test thoroughly in ProxmoxVED — run the script against a real Proxmox instance
 5. Open a PR in **ProxmoxVED** for review and testing
-6. Once accepted and verified there, the script will be promoted to ProxmoxVE by maintainers
+6. Once accepted and verified there, the script can be considered for promotion upstream and then mirrored into this fork
 
 Follow the coding standards at [community-scripts.org/docs/contribution](https://community-scripts.org/docs/contribution).
 
@@ -87,13 +89,15 @@ winget install --id koalaman.shellcheck
 winget install --id rhysd.actionlint
 ```
 
-The current repository has legacy findings, so the GitHub Actions check is advisory. New and updated scripts should avoid adding live remote-code execution, floating high-risk downloads, unnecessary privileged containers, unauthenticated Docker socket exposure, broad `chmod 777`, or unsafe recursive deletion patterns.
+The current repository still has legacy findings, so the GitHub Actions check is advisory. New and updated scripts should avoid adding live remote-code execution, floating high-risk downloads, unnecessary privileged containers, unauthenticated Docker socket exposure, broad `chmod 777`, or unsafe recursive deletion patterns.
+
+When a risky pattern is genuinely required, document it in the PR. A good exception names the script, explains why the safer default does not work, describes any user-facing warning, and links to vendor or upstream documentation where possible.
 
 ---
 
 ### Fixing a bug or improving an existing script
 
-Changes to scripts that already exist in ProxmoxVE go directly here:
+Changes to scripts that already exist in this fork go directly here:
 
 1. Fork **this repository** (ProxmoxVE) and clone it:
 
@@ -110,7 +114,7 @@ Changes to scripts that already exist in ProxmoxVE go directly here:
 
 3. Make your changes to the relevant files in `ct/` and/or `install/`
 
-4. Open a PR from your fork to `community-scripts/ProxmoxVE/main`
+4. Open a PR from your fork to `MTG-Thomas/ProxmoxVE/main`
 
 Your PR should only contain the files you changed. Do not include unrelated modifications.
 
@@ -126,6 +130,10 @@ Key rules at a glance:
 - Quote all variables: `"$VAR"` not `$VAR`
 - Use lowercase variable names
 - Do not hardcode credentials or sensitive values
+- Prefer unprivileged containers. Privileged mode needs an app-specific reason.
+- Prefer pinned versions, checksums, or digests for high-risk downloads.
+- Avoid `curl | bash`, `bash <(curl ...)`, and `source <(curl ...)` except for reviewed fork-owned helper bootstraps.
+- Avoid `chmod 777`, unauthenticated Docker TCP listeners, broad device grants, and unvalidated `rm -rf`.
 
 Full standards and examples: **[community-scripts.org/docs/contribution](https://community-scripts.org/docs/contribution)**
 
@@ -153,8 +161,7 @@ dev_mode="trace,keep" bash -c "$(curl -fsSL https://raw.githubusercontent.com/MT
 
 ## Notes
 
-- **Website metadata** (name, description, logo, tags) is managed via the website — use the "Report Issue" link on any script page to request changes. Do not submit metadata changes via repo files.
-- **JSON files** in `json/` define script properties used by the website. See existing files for structure reference.
+- This repository does not currently carry the upstream website frontend. The GitHub Pages workflow publishes a small fork landing page.
+- Upstream website metadata and catalog behavior live outside this fork. Do not assume a change here updates community-scripts.org.
 - Keep PRs small and focused. One fix or feature per PR is ideal.
-- PRs with **new scripts** opened against ProxmoxVE will be closed — submit them to [ProxmoxVED](https://github.com/community-scripts/ProxmoxVED) instead.
-- PRs that fail CI checks will not be merged.
+- PRs that fail CI checks will not be merged unless the failure is clearly unrelated and documented.
