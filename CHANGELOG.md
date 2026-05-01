@@ -450,6 +450,11 @@ Exercise vigilance regarding copycat or coat-tailing sites that seek to exploit 
 
 ## 2026-05-01
 
+### 🆕 New Scripts
+
+  - SoulSync ([#14124](https://github.com/community-scripts/ProxmoxVE/pull/14124))
+- Teable ([#14125](https://github.com/community-scripts/ProxmoxVE/pull/14125))
+
 ### 🚀 Updated Scripts
 
   - #### 🐞 Bug Fixes
