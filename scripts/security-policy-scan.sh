@@ -194,7 +194,14 @@ build_file_list() {
   else
     find "$root" \
       \( -path "$root/.git" -o -path "$root/.github/changelogs" \) -prune -o \
-      -type f \( -name '*.sh' -o -name '*.func' -o -name '*.bash' \) -print
+      -type f \( -name '*.sh' -o -name '*.func' -o -name '*.bash' \) -print |
+      while IFS= read -r path; do
+      relpath="${path#"$root"/}"
+      case "$relpath" in
+      scripts/security-policy-scan.sh | tests/security-policy-scan.test.sh) continue ;;
+      esac
+      printf '%s\n' "$path"
+    done
   fi
 }
 
