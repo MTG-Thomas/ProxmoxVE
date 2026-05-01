@@ -12,7 +12,7 @@ Fixes #
 
 - [ ] **Self-review completed** – Code follows project standards.
 - [ ] **Tested thoroughly** – Changes work as expected.
-- [ ] **No security risks** – No hardcoded secrets, unnecessary privilege escalations, or permission issues.
+- [ ] **Security policy checked** – No new hardcoded secrets, live remote-code execution, unnecessary privilege escalation, unauthenticated Docker socket exposure, or unpinned high-risk downloads.
 
 ---
 
