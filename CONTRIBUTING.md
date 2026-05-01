@@ -66,6 +66,29 @@ New scripts are **not accepted directly in this repository**. The workflow is:
 
 Follow the coding standards at [community-scripts.org/docs/contribution](https://community-scripts.org/docs/contribution).
 
+### Security policy checks
+
+Script changes are reviewed against the repository's [script security model](docs/security/script-security-model.md). The advisory scanner can be run locally before opening a PR:
+
+```bash
+bash scripts/security-policy-scan.sh --advisory
+```
+
+To check only files changed from your current base branch:
+
+```bash
+bash scripts/security-policy-scan.sh --changed origin/main --advisory
+```
+
+On Windows, use Git Bash or WSL for the Bash scripts. ShellCheck and actionlint also have Windows builds and can be installed with:
+
+```powershell
+winget install --id koalaman.shellcheck
+winget install --id rhysd.actionlint
+```
+
+The current repository has legacy findings, so the GitHub Actions check is advisory. New and updated scripts should avoid adding live remote-code execution, floating high-risk downloads, unnecessary privileged containers, unauthenticated Docker socket exposure, broad `chmod 777`, or unsafe recursive deletion patterns.
+
 ---
 
 ### Fixing a bug or improving an existing script

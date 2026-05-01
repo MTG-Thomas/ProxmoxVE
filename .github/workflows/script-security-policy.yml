@@ -1,0 +1,54 @@
+name: Script Security Policy
+
+on:
+  pull_request:
+    paths:
+      - "ct/**/*.sh"
+      - "install/**/*.sh"
+      - "misc/**/*.func"
+      - "tools/**/*.sh"
+      - "turnkey/**/*.sh"
+      - "vm/**/*.sh"
+      - "scripts/security-policy-scan.sh"
+      - "tests/security-policy-scan.test.sh"
+      - "docs/security/script-security-model.md"
+      - ".github/workflows/script-security-policy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Advisory scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install lint tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck > /dev/null
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Lint policy scripts
+        run: shellcheck scripts/security-policy-scan.sh tests/security-policy-scan.test.sh
+
+      - name: Lint workflow
+        run: actionlint .github/workflows/script-security-policy.yml
+
+      - name: Run scanner tests
+        run: bash tests/security-policy-scan.test.sh
+
+      - name: Run advisory security policy scan on changed files
+        if: github.event_name == 'pull_request'
+        run: |
+          bash scripts/security-policy-scan.sh --changed "origin/${{ github.base_ref }}" --advisory --format markdown | tee "$GITHUB_STEP_SUMMARY"
+
+      - name: Run advisory security policy scan on repository
+        if: github.event_name != 'pull_request'
+        run: |
+          bash scripts/security-policy-scan.sh --advisory --format markdown | tee "$GITHUB_STEP_SUMMARY"
