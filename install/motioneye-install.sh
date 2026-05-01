@@ -25,7 +25,7 @@ $STD apt install -y \
   python3 \
   python3-dev \
   python3-pip
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
+rm -f -- /usr/lib/python3.*/EXTERNALLY-MANAGED
 msg_ok "Setup Python3"
 
 msg_info "Installing Motion"
@@ -43,7 +43,7 @@ $STD apt update
 $STD pip install git+https://github.com/motioneye-project/motioneye.git@dev
 mkdir -p /etc/motioneye
 chown -R root:root /etc/motioneye
-chmod -R 777 /etc/motioneye
+chmod -R u=rwX,g=rX,o=rX /etc/motioneye
 curl -fsSL "https://raw.githubusercontent.com/motioneye-project/motioneye/dev/motioneye/extra/motioneye.conf.sample" -o "/etc/motioneye/motioneye.conf"
 mkdir -p /var/lib/motioneye
 msg_ok "Installed MotionEye"

@@ -101,7 +101,7 @@ chown -R :www-data /opt/*
 chmod -R g+r /opt/*
 chmod -R g+rw /opt/*
 chown -R www-data:www-data /opt/*
-chmod -R 777 /opt/*
+chmod -R u=rwX,g=rwX,o=rX /opt/*
 msg_ok "Setup Permissions"
 
 motd_ssh

@@ -53,7 +53,7 @@ function update_script() {
     [ -d "$BACKUP_DIR/var" ] && cp -r "$BACKUP_DIR/var" /opt/kimai/
     [ -f "$BACKUP_DIR/.env" ] && cp "$BACKUP_DIR/.env" /opt/kimai/
     [ -f "$BACKUP_DIR/local.yaml" ] && cp "$BACKUP_DIR/local.yaml" /opt/kimai/config/packages/
-    rm -rf "$BACKUP_DIR"
+    rm -rf -- "${BACKUP_DIR:?}"
     cd /opt/kimai 
     sed -i '/^admin_lte:/,/^[^[:space:]]/d' config/packages/local.yaml
     $STD composer install --no-dev --optimize-autoloader
@@ -69,8 +69,8 @@ function update_script() {
     chmod -R g+r /opt/*
     chmod -R g+rw /opt/*
     chown -R www-data:www-data /opt/*
-    chmod -R 777 /opt/*
-    rm -rf "$BACKUP_DIR"
+    chmod -R u=rwX,g=rwX,o=rX /opt/*
+    rm -rf -- "${BACKUP_DIR:?}"
     msg_ok "Setup Permissions"
     msg_ok "Updated successfully!"
   fi

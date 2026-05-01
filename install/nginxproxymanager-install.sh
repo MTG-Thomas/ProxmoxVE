@@ -36,7 +36,7 @@ $STD /opt/certbot/bin/pip install certbot certbot-dns-cloudflare
 ln -sf /opt/certbot/bin/certbot /usr/local/bin/certbot
 msg_ok "Set up Certbot"
 
-fetch_and_deploy_gh_release "openresty" "openresty/openresty" "prebuild" "latest" "/opt/openresty" "openresty-*.tar.gz"
+fetch_and_deploy_gh_release "openresty" "openresty/openresty" "prebuild" "v1.27.1.2" "/opt/openresty" "openresty-*.tar.gz"
 
 msg_info "Building OpenResty"
 cd /opt/openresty
@@ -52,7 +52,7 @@ $STD ./configure \
   --with-stream_ssl_module
 $STD make -j"$(nproc)"
 $STD make install
-rm -rf /opt/openresty
+rm -rf -- /opt/openresty
 
 cat <<'EOF' >/lib/systemd/system/openresty.service
 [Unit]
@@ -72,7 +72,7 @@ EOF
 msg_ok "Built OpenResty"
 
 NODE_VERSION="22" NODE_MODULE="yarn" setup_nodejs
-RELEASE=$(get_latest_github_release "NginxProxyManager/nginx-proxy-manager")
+RELEASE="2.14.0"
 fetch_and_deploy_gh_release "nginxproxymanager" "NginxProxyManager/nginx-proxy-manager" "tarball" "v${RELEASE}"
 
 msg_info "Setting up Environment"
@@ -112,7 +112,7 @@ mkdir -p /tmp/nginx/body \
   /var/lib/nginx/cache/private \
   /var/cache/nginx/proxy_temp
 
-chmod -R 777 /var/cache/nginx
+chmod -R u=rwX,g=rwX,o=rX /var/cache/nginx
 chown root /tmp/nginx
 
 echo resolver "$(awk 'BEGIN{ORS=" "} $1=="nameserver" {print ($2 ~ ":")? "["$2"]": $2}' /etc/resolv.conf);" >/etc/nginx/conf.d/include/resolvers.conf
@@ -138,7 +138,7 @@ cp -r /opt/nginxproxymanager/frontend/public/images/* /app/frontend/images
 msg_ok "Built Frontend"
 
 msg_info "Initializing Backend"
-rm -rf /app/config/default.json
+rm -f -- /app/config/default.json
 if [ ! -f /app/config/production.json ]; then
   cat <<'EOF' >/app/config/production.json
 {
