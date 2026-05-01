@@ -122,7 +122,7 @@ msg_info "Building SQLite Extensions"
 $STD bash /opt/frigate/docker/main/build_sqlite_vec.sh
 msg_ok "Built SQLite Extensions"
 
-fetch_and_deploy_gh_release "go2rtc" "AlexxIT/go2rtc" "singlefile" "latest" "/usr/local/go2rtc/bin" "go2rtc_linux_amd64"
+fetch_and_deploy_gh_release "go2rtc" "AlexxIT/go2rtc" "singlefile" "v1.9.14" "/usr/local/go2rtc/bin" "go2rtc_linux_amd64"
 
 msg_info "Installing Tempio"
 sed -i 's|/rootfs/usr/local|/usr/local|g' /opt/frigate/docker/main/install_tempio.sh
@@ -237,7 +237,7 @@ cd /opt/frigate/web
 $STD npm install
 $STD npm run build
 mv /opt/frigate/web/dist/BASE_PATH/monacoeditorwork/* /opt/frigate/web/dist/assets/
-rm -rf /opt/frigate/web/dist/BASE_PATH
+rm -rf -- /opt/frigate/web/dist/BASE_PATH
 cp -r /opt/frigate/web/dist/* /opt/frigate/web/
 sed -i '/^s6-svc -O \.$/s/^/#/' /opt/frigate/docker/main/rootfs/etc/s6-overlay/s6-rc.d/frigate/run
 msg_ok "Built Frigate Application"
@@ -323,7 +323,7 @@ Before=frigate.service go2rtc.service nginx.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c '/bin/mkdir -p /dev/shm/logs/{frigate,go2rtc,nginx} && /bin/touch /dev/shm/logs/{frigate/current,go2rtc/current,nginx/current} && /bin/chmod -R 777 /dev/shm/logs'
+ExecStart=/bin/bash -c '/bin/mkdir -p /dev/shm/logs/{frigate,go2rtc,nginx} && /bin/touch /dev/shm/logs/{frigate/current,go2rtc/current,nginx/current} && /bin/chmod -R u=rwX,g=rwX,o=rX /dev/shm/logs'
 
 [Install]
 WantedBy=multi-user.target
@@ -402,7 +402,7 @@ systemctl enable -q --now nginx
 msg_ok "Created Services"
 
 msg_info "Cleaning Up"
-rm -rf /opt/libusb /wheels /models/*.tar.gz
+rm -rf -- /opt/libusb /wheels /models/*.tar.gz
 msg_ok "Cleaned Up"
 
 motd_ssh

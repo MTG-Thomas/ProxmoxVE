@@ -35,10 +35,10 @@ function update_script() {
       systemctl stop openresty
       $STD apt purge -y nodejs npm
       $STD apt autoremove -y
-      rm -rf /usr/local/bin/node /usr/local/bin/npm
-      rm -rf /usr/local/lib/node_modules
-      rm -rf ~/.npm
-      rm -rf /root/.npm
+      rm -f -- /usr/local/bin/node /usr/local/bin/npm
+      rm -rf -- /usr/local/lib/node_modules
+      rm -rf -- ~/.npm
+      rm -rf -- /root/.npm
     fi
   fi
 
@@ -77,7 +77,7 @@ function update_script() {
       --with-stream_ssl_module
     $STD make -j"$(nproc)"
     $STD make install
-    rm -rf /opt/openresty
+    rm -rf -- /opt/openresty
     cat <<'EOF' >/lib/systemd/system/openresty.service
 [Unit]
 Description=The OpenResty Application Platform
@@ -117,7 +117,7 @@ EOF
     CLEAN_INSTALL=1 fetch_and_deploy_gh_release "nginxproxymanager" "NginxProxyManager/nginx-proxy-manager" "tarball" "${CHECK_UPDATE_RELEASE}" "/opt/nginxproxymanager"
 
     msg_info "Cleaning old files"
-    $STD rm -rf /app \
+    $STD rm -rf -- /app \
       /var/www/html \
       /etc/nginx \
       /var/log/nginx \
@@ -163,7 +163,7 @@ EOF
       /var/lib/nginx/cache/private \
       /var/cache/nginx/proxy_temp
 
-    chmod -R 777 /var/cache/nginx
+    chmod -R u=rwX,g=rwX,o=rX /var/cache/nginx
     chown root /tmp/nginx
 
     echo resolver "$(awk 'BEGIN{ORS=" "} $1=="nameserver" {print ($2 ~ ":")? "["$2"]": $2}' /etc/resolv.conf);" >/etc/nginx/conf.d/include/resolvers.conf
@@ -188,7 +188,7 @@ EOF
     msg_ok "Built Frontend"
 
     msg_info "Initializing Backend"
-    rm -rf /app/config/default.json
+    rm -f -- /app/config/default.json
     if [ ! -f /app/config/production.json ]; then
       cat <<'EOF' >/app/config/production.json
 {

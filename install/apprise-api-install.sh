@@ -31,7 +31,8 @@ mv apprise_api/ webapp
 touch /etc/nginx/server-override.conf
 touch /etc/nginx/location-override.conf
 mkdir -p /config/store /attach /plugin /tmp/apprise /opt/apprise/logs
-chmod 1777 /tmp/apprise && chmod 777 /config /config/store /attach /plugin /opt/apprise/logs
+chmod 1777 /tmp/apprise
+chmod 755 /config /config/store /attach /plugin /opt/apprise/logs
 sed -i \
   -e '/[[]program:nginx]/,/^[[]/ s|stdout_logfile=/dev/stdout|stdout_logfile=/opt/apprise/logs/nginx.log|' \
   -e '/[[]program:nginx]/,/^[[]/ s|stderr_logfile=/dev/stderr|stderr_logfile=/opt/apprise/logs/nginx_error.log|' \
