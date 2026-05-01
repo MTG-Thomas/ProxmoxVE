@@ -86,6 +86,7 @@ fi
 
 declare -A rule_title=(
   [remote-code-execution]="Remote code is sourced or executed directly"
+  [untrusted-upstream-bootstrap]="Runtime helper is bootstrapped from public upstream"
   [pinned-version-required]="Runtime dependency uses a floating latest reference"
   [privileged-container-default]="Container defaults to privileged mode"
   [docker-insecure-tcp]="Docker TCP socket is exposed without TLS"
@@ -97,6 +98,7 @@ declare -A rule_title=(
 
 declare -A rule_guidance=(
   [remote-code-execution]="Fetch through a vetted helper that pins the expected repo ref and verifies content before sourcing or executing it."
+  [untrusted-upstream-bootstrap]="Fork runtime scripts must bootstrap reviewed helpers from MTG-Thomas/ProxmoxVE unless a reviewer approves a documented exception."
   [pinned-version-required]="Prefer a manifest-pinned version, digest, or checksum. Floating latest is allowed only with an explicit exception."
   [privileged-container-default]="Default to unprivileged containers and document any app-specific exception in the privilege allowlist."
   [docker-insecure-tcp]="Do not expose Docker on tcp://0.0.0.0:2375. Require localhost-only, TLS, or an explicit break-glass path."
@@ -211,10 +213,15 @@ if [[ "${#scan_files[@]}" -gt 0 ]]; then
     printf '%s\n' "${scan_files[@]}" |
       xargs awk '
       /^[[:space:]]*#/ { next }
-      index($0, "source <(curl") || index($0, "source <(wget") ||
+      index($0, "raw.githubusercontent.com/community-scripts/ProxmoxVE/main") ||
+      index($0, "git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main") {
+        print "untrusted-upstream-bootstrap\t" FILENAME "\t" FNR "\t" $0
+      }
+      (index($0, "source <(curl") || index($0, "source <(wget") ||
       index($0, "bash <(curl") || index($0, "sh <(curl") ||
       $0 ~ /curl[^|]*\|[[:space:]]*(bash|sh)/ ||
-      $0 ~ /wget[^|]*\|[[:space:]]*(bash|sh)/ {
+      $0 ~ /wget[^|]*\|[[:space:]]*(bash|sh)/) &&
+      !($0 ~ /source <\(curl -fsSL https:\/\/raw\.githubusercontent\.com\/MTG-Thomas\/ProxmoxVE\/main\/misc\/[A-Za-z0-9_.-]+\.func\)/) {
         print "remote-code-execution\t" FILENAME "\t" FNR "\t" $0
       }
       $0 ~ /:latest([^[:alnum:]_.-]|$)/ ||

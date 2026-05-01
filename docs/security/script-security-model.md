@@ -7,6 +7,7 @@ This repository publishes shell scripts that users run as root on Proxmox hosts 
 - Host-side scripts can change Proxmox host storage, networking, VM/container configuration, and LXC device access.
 - Container install scripts normally run as root inside the guest and can install packages, write services, create users, and store credentials.
 - Remote downloads are part of the product, but remote code must be reviewed as a supply-chain boundary.
+- Fork-owned runtime scripts must bootstrap shared helpers from this fork's `MTG-Thomas/ProxmoxVE` branch, not from the public upstream repository.
 - Generated credentials, API tokens, and one-time bootstrap secrets must be treated as sensitive even when they are created locally.
 
 ## Baseline Rules
@@ -14,6 +15,7 @@ This repository publishes shell scripts that users run as root on Proxmox hosts 
 New or materially changed scripts should follow these rules unless a reviewer accepts a documented exception:
 
 - Do not source or execute live remote code directly with `source <(curl ...)`, `bash <(curl ...)`, `sh <(curl ...)`, `curl ... | bash`, or similar patterns.
+- The only allowed remote helper bootstrap pattern is a reviewed `source <(curl -fsSL https://raw.githubusercontent.com/MTG-Thomas/ProxmoxVE/main/misc/*.func)` call used by this fork's entry scripts.
 - Prefer repository-local helpers or a fetch helper that pins an expected source ref and verifies downloaded content before execution.
 - Avoid floating `latest` references for binaries, archives, Docker images, VM images, and installer scripts. Prefer an explicit version, digest, or checksum.
 - Default LXC containers to unprivileged mode. Privileged containers require an app-specific reason.

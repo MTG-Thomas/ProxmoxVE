@@ -326,7 +326,7 @@ CL=$(echo "\033[m")
 
 # Telemetry
 # shellcheck disable=SC1090
-source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/api.func) 2>/dev/null || true
+source <(curl -fsSL https://raw.githubusercontent.com/MTG-Thomas/ProxmoxVE/main/misc/api.func) 2>/dev/null || true
 declare -f init_tool_telemetry &>/dev/null && init_tool_telemetry "step-ca-admin" "step-ca"
 
 header_info
