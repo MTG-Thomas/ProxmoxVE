@@ -85,11 +85,20 @@ set -e
 assert_contains "advisory mode" "$advisory_output"
 assert_contains "6 finding(s)" "$advisory_output"
 
-mkdir -p "$tmpdir/clean/ct" "$tmpdir/clean/docs/security"
+mkdir -p "$tmpdir/clean/ct" "$tmpdir/clean/docs/security" "$tmpdir/clean/scripts" "$tmpdir/clean/tests"
 cat >"$tmpdir/clean/ct/example.sh" <<'SCRIPT'
 #!/usr/bin/env bash
 source ./misc/build.func
 var_unprivileged="${var_unprivileged:-1}"
+SCRIPT
+cat >"$tmpdir/clean/scripts/security-policy-scan.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+echo 'raw.githubusercontent.com/community-scripts/ProxmoxVE/main'
+echo 'chmod 777'
+SCRIPT
+cat >"$tmpdir/clean/tests/security-policy-scan.test.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+echo 'source <(curl -fsSL https://example.invalid/test.func)'
 SCRIPT
 cat >"$tmpdir/clean/docs/security/script-security-model.md" <<'DOC'
 # Script Security Model
